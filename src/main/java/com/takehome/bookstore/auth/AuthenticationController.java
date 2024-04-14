@@ -19,7 +19,7 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     @PostMapping("/register")
-    @Operation(description = "POST Registration Endpoint", summary = "This is for registering a user, the default role is USER")
+    @Operation(description = "This is for registering a user, the default role is USER", summary = "POST Registration Endpoint")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
 
         return ResponseEntity.ok(service.register(request));

@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class UsersController {
 
     @GetMapping
-    @Hidden
+    @Hidden // To hide it in the swagger docs
     public ResponseEntity<String> sayHello() {
         return ResponseEntity.ok("Hello, user! this is a secure endpoint though");
     }

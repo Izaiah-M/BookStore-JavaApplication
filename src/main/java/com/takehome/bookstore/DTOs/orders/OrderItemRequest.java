@@ -1,6 +1,7 @@
-package com.takehome.bookstore.DTOs.genres;
+package com.takehome.bookstore.DTOs.orders;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,11 +13,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateGenreRequest {
+public class OrderItemRequest {
 
     @Valid
-    @NotBlank(message = "Name is required")
-    @NotNull(message = "Name should not be null")
-    private String name;
+    @NotBlank
+    @NotNull(message = "Book ID is required")
+    private Integer bookId;
 
+    @Valid
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
 }

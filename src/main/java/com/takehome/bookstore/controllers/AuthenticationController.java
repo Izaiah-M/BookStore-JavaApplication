@@ -11,8 +11,8 @@ import com.takehome.bookstore.DTOs.auth.AuthenticationResponse;
 import com.takehome.bookstore.DTOs.auth.RegisterRequest;
 import com.takehome.bookstore.services.AuthenticationService;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,15 +26,16 @@ public class AuthenticationController {
     // TODO: A way to create And Admin
 
     @PostMapping("/register")
-    @Operation(description = "This is for registering a user, the default role is USER", summary = "POST Registration Endpoint")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    // @Operation(description = "This is for registering a user, the default role is
+    // USER", summary = "POST Registration Endpoint")
+    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
-            @RequestBody AuthenticationRequest request) {
+            @Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.login(request));
 
     }

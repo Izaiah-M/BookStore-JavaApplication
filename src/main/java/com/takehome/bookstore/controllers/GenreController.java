@@ -18,12 +18,16 @@ import com.takehome.bookstore.models.Books.Genre;
 import com.takehome.bookstore.services.GenreService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/genres")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Genres")
 public class GenreController {
 
     private final GenreService service;

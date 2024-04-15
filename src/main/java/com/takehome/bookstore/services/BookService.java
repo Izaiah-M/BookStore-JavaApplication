@@ -2,8 +2,10 @@ package com.takehome.bookstore.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.takehome.bookstore.DTOs.books.BookUpdatedResponse;
 import com.takehome.bookstore.DTOs.books.CreateBookRequest;
@@ -27,8 +29,10 @@ public class BookService {
 
         // Fetch the genre by ID from the database
         Genre genre = genreRepository.findById(request.getGenreId())
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Genre with ID " + request.getGenreId() + " not found"));
+                .orElseThrow(() -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Genre with ID " + request.getGenreId() + " not found");
+                });
 
         // Create the book entity
         var book = Book.builder()

@@ -30,13 +30,11 @@ public class Book {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    private int quantity;
+    private Integer quantity;
 
-    private double price;
+    private Double price;
 
     private String description;
 
-    private int publicationYear;
-
-    private String imageUrl;
+    private Integer publicationYear;
 }

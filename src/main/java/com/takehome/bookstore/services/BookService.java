@@ -1,5 +1,8 @@
 package com.takehome.bookstore.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.takehome.bookstore.DTOs.books.BookUpdatedResponse;
@@ -71,6 +74,21 @@ public class BookService {
                 .bookId(updatedBook.getId())
                 .build();
 
+    }
+
+    public Page<Book> getAllBooks(PageRequest pageRequest) {
+        return bookRepository.findAll(pageRequest);
+    }
+
+    public ResponseEntity<Book> getBookById(Integer bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElse(null);
+
+        if (book != null) {
+            return ResponseEntity.ok(book);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

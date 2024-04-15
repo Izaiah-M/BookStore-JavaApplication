@@ -29,7 +29,7 @@ public class CreateBookRequest {
 
     @NotBlank(message = "Price must be specified")
     @Positive(message = "Price must be a positive number")
-    private double price;
+    private Double price;
 
     @NotBlank(message = "Description must be specified")
     private String description;

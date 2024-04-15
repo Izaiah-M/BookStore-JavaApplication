@@ -1,4 +1,4 @@
-package com.takehome.bookstore.Config;
+package com.takehome.bookstore.config;
 
 import java.io.IOException;
 

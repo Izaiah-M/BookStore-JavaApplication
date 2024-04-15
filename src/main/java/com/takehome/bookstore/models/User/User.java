@@ -1,4 +1,4 @@
-package com.takehome.bookstore.User;
+package com.takehome.bookstore.models.User;
 
 import java.util.Collection;
 import java.util.List;

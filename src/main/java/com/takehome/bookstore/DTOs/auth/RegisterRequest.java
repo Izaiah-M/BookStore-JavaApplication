@@ -1,4 +1,4 @@
-package com.takehome.bookstore.auth;
+package com.takehome.bookstore.DTOs.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

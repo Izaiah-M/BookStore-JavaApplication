@@ -1,6 +1,12 @@
 package com.takehome.bookstore.controllers;
 
+import java.util.HashMap;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +44,20 @@ public class AuthenticationController {
             @Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.login(request));
 
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exp) {
+        var errors = new HashMap<String, String>();
+
+        exp.getBindingResult().getAllErrors()
+                .forEach((error) -> {
+                    var fieldName = ((FieldError) error).getField();
+                    var errorMessage = error.getDefaultMessage();
+                    errors.put(fieldName, errorMessage);
+                });
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

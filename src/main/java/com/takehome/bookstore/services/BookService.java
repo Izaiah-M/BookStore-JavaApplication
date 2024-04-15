@@ -35,10 +35,10 @@ public class BookService {
                 });
 
         // Create the book entity
-        var book = Book.builder()
+        Book book = Book.builder()
                 .title(request.getTitle())
                 .author(request.getAuthor())
-                .genre(genre)
+                // .genre(genre)
                 .quantity(request.getQuantity())
                 .price(request.getPrice())
                 .build();

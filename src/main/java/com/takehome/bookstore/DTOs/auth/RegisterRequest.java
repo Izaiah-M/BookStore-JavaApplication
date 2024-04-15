@@ -1,6 +1,7 @@
 package com.takehome.bookstore.DTOs.auth;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequest {
 
-    @NotBlank(message = "firstname is required")
+    @NotEmpty
     private String firstname;
 
-    @NotBlank(message = "lastname is required")
+    @NotEmpty
     private String lastname;
 
-    @NotBlank(message = "email is required")
+    @NotEmpty
+    @Email
     private String email;
 
-    @NotBlank(message = "password is required")
+    @NotEmpty
     private String password;
 }

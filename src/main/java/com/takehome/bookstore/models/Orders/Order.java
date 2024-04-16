@@ -3,6 +3,7 @@ package com.takehome.bookstore.models.Orders;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.takehome.bookstore.models.User.User;
 
 import jakarta.persistence.CascadeType;
@@ -41,7 +42,8 @@ public class Order {
 
     private LocalDateTime orderDate;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("order")
     private List<OrderItem> orderItems;
 
     private Double totalPrice;

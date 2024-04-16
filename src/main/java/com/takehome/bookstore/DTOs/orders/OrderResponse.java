@@ -15,4 +15,6 @@ public class OrderResponse {
 
     private Integer orderId;
 
+    private Double orderAmount;
+
 }

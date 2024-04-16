@@ -1,6 +1,6 @@
 package com.takehome.bookstore.DTOs.books;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -14,27 +14,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateBookRequest {
 
-    @NotBlank(message = "Title is required")
+    @NotEmpty
     private String title;
 
-    @NotBlank(message = "Author is required")
+    @NotEmpty
     private String author;
 
-    @NotNull(message = "Genre ID is required")
+    @NotNull
     private Integer genreId;
 
-    @NotBlank(message = "Number of copies must be specified")
+    @NotNull
     @Positive(message = "Quantity must be a positive number")
     private Integer quantity;
 
-    @NotBlank(message = "Price must be specified")
+    @NotNull
     @Positive(message = "Price must be a positive number")
     private Double price;
 
-    @NotBlank(message = "Description must be specified")
+    @NotEmpty
     private String description;
 
-    @NotBlank(message = "PublicationYear must be specified")
+    @NotNull
     private Integer publicationYear;
 
 }

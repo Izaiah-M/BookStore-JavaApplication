@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.takehome.bookstore.DTOs.auth.AdminAuthenticationRequest;
 import com.takehome.bookstore.DTOs.auth.AuthenticationRequest;
 import com.takehome.bookstore.DTOs.auth.AuthenticationResponse;
 import com.takehome.bookstore.DTOs.auth.RegisterRequest;
@@ -34,6 +35,25 @@ public class AuthenticationService {
                                 .email(request.getEmail())
                                 .password(passwordEncoder.encode(request.getPassword()))
                                 .role(USER)
+                                .build();
+
+                repository.save(user);
+
+                var jwtToken = jwtService.generateToken(user);
+
+                return AuthenticationResponse.builder()
+                                .token(jwtToken)
+                                .build();
+        }
+
+        // For registering admins at the start of the application
+        public AuthenticationResponse registerAdminManager(AdminAuthenticationRequest request) {
+                var user = User.builder()
+                                .firstname(request.getFirstname())
+                                .lastname(request.getLastname())
+                                .email(request.getEmail())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .role(request.getRole())
                                 .build();
 
                 repository.save(user);

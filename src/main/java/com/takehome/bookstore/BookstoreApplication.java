@@ -8,7 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.takehome.bookstore.DTOs.auth.RegisterRequest;
+import com.takehome.bookstore.DTOs.auth.AdminAuthenticationRequest;
 import com.takehome.bookstore.models.User.UserRepository;
 import com.takehome.bookstore.services.AuthenticationService;
 
@@ -23,7 +23,7 @@ public class BookstoreApplication {
 	public CommandLineRunner commandLineRunner(AuthenticationService service, UserRepository userRepository) {
 		return args -> {
 			if (!userRepository.existsByRole(ADMIN)) {
-				var admin = RegisterRequest.builder()
+				var admin = AdminAuthenticationRequest.builder()
 						.firstname("Admin")
 						.lastname("Admin")
 						.email("admin@mail.com")
@@ -31,13 +31,13 @@ public class BookstoreApplication {
 						.role(ADMIN)
 						.build();
 
-				System.out.println("Admin token: " + service.register(admin).getToken());
+				System.out.println("Admin token: " + service.registerAdminManager(admin).getToken());
 			} else {
 				System.out.println("Admin role already exists");
 			}
 
 			if (!userRepository.existsByRole(MANAGER)) {
-				var manager = RegisterRequest.builder()
+				var manager = AdminAuthenticationRequest.builder()
 						.firstname("Manager")
 						.lastname("Manager")
 						.email("manager@mail.com")
@@ -45,7 +45,7 @@ public class BookstoreApplication {
 						.role(MANAGER)
 						.build();
 
-				System.out.println("Manager token: " + service.register(manager).getToken());
+				System.out.println("Manager token: " + service.registerAdminManager(manager).getToken());
 			} else {
 				System.out.println("Manager role already exists");
 			}

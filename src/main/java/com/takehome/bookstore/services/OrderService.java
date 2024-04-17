@@ -104,7 +104,7 @@ public class OrderService {
         savedOrder.setTotalPrice(totalPrice);
 
         // Save the updated order with associated order items
-        Order updatedOrder = orderRepository.save(newOrder);
+        Order updatedOrder = orderRepository.save(savedOrder);
 
         return OrderResponse.builder()
                 .message("Your order has been successfully placed!")

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.takehome.bookstore.DTOs.books.DeleteResponse;
+import com.takehome.bookstore.DTOs.orders.CancelOrderRequest;
+import com.takehome.bookstore.DTOs.orders.CancelOrderResponse;
 import com.takehome.bookstore.DTOs.orders.OrderRequest;
 import com.takehome.bookstore.DTOs.orders.OrderResponse;
 import com.takehome.bookstore.models.Orders.Order;
@@ -41,24 +43,44 @@ public class OrdersController {
         return ResponseEntity.ok(service.placeOrder(request));
     }
 
-    // TODO: Create endpoint to get all orders for by a specific user
+    @PostMapping("/cancel")
+    public ResponseEntity<CancelOrderResponse> cancelOrder(@Valid @RequestBody CancelOrderRequest request) {
+
+        return ResponseEntity.ok(service.cancelOrder(request));
+    }
+
+    @PostMapping("/complete-order")
+    public ResponseEntity<CancelOrderResponse> completeOrder(@Valid @RequestBody CancelOrderRequest request) {
+
+        return ResponseEntity.ok(service.completeOrder(request));
+    }
 
     // Endpoint for getting all orders
     @GetMapping
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public ResponseEntity<Page<Order>> getAllOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "5") Integer size) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
         return ResponseEntity.ok(service.getAllOrders(pageRequest));
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<Order>> getUserOrdersByUserId(@PathVariable @NotNull Integer userId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "5") Integer size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(service.getUserOrdersByUserId(userId, pageRequest));
+    }
+
     // Endpoint for getting a specific order by ID
     @GetMapping("/{orderId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
-    public ResponseEntity<Order> getOrderById(@PathVariable Integer orderId) {
+    public ResponseEntity<Order> getOrderById(@PathVariable @NotNull Integer orderId) {
 
         return service.getOrderById(orderId);
     }

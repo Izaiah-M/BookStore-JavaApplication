@@ -1,5 +1,9 @@
 package com.takehome.bookstore.services;
 
+import static com.takehome.bookstore.models.Orders.Status.CANCELED;
+import static com.takehome.bookstore.models.Orders.Status.COMPLETED;
+import static com.takehome.bookstore.models.Orders.Status.PENDING;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.takehome.bookstore.DTOs.books.DeleteResponse;
+import com.takehome.bookstore.DTOs.orders.CancelOrderRequest;
+import com.takehome.bookstore.DTOs.orders.CancelOrderResponse;
 import com.takehome.bookstore.DTOs.orders.OrderItemRequest;
 import com.takehome.bookstore.DTOs.orders.OrderRequest;
 import com.takehome.bookstore.DTOs.orders.OrderResponse;
@@ -22,7 +28,6 @@ import com.takehome.bookstore.models.Orders.Order;
 import com.takehome.bookstore.models.Orders.OrderItem;
 import com.takehome.bookstore.models.Orders.OrderItemRepository;
 import com.takehome.bookstore.models.Orders.OrderRepository;
-import com.takehome.bookstore.models.Orders.Status;
 import com.takehome.bookstore.models.User.User;
 import com.takehome.bookstore.models.User.UserRepository;
 
@@ -49,7 +54,7 @@ public class OrderService {
                 Order order = Order.builder()
                                 .user(user)
                                 .orderDate(LocalDateTime.now())
-                                .status(Status.PENDING)
+                                .status(PENDING)
                                 .build();
 
                 // Save the order first
@@ -140,6 +145,58 @@ public class OrderService {
 
                 return DeleteResponse.builder()
                                 .message("Order has been successfully deleted")
+                                .build();
+        }
+
+        public Page<Order> getUserOrdersByUserId(@NotNull Integer userId, PageRequest pageRequest) {
+                return orderRepository.findByUserId(userId, pageRequest);
+        }
+
+        public CancelOrderResponse cancelOrder(@Valid CancelOrderRequest request) {
+                Order existingOrder = orderRepository.findById(request.getOrderId())
+                                .orElseThrow(() -> new NoSuchElementException(
+                                                "Order with ID " + request.getOrderId() + " not found"));
+
+                // Check if the order status is already "Cancelled" or "Delivered"
+                if (existingOrder.getStatus() == CANCELED || existingOrder.getStatus() == COMPLETED) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Order with ID " + request.getOrderId() + " cannot be cancelled.");
+                }
+
+                // Update the order status to "Cancelled"
+                existingOrder.setStatus(CANCELED);
+
+                // Save the updated order
+                Order cancelledOrder = orderRepository.save(existingOrder);
+
+                return CancelOrderResponse.builder()
+                                .message("Order with ID " + request.getOrderId() + " has been cancelled.")
+                                .orderId(cancelledOrder.getId())
+                                .build();
+
+        }
+
+        public CancelOrderResponse completeOrder(@Valid CancelOrderRequest request) {
+                Order existingOrder = orderRepository.findById(request.getOrderId())
+                                .orElseThrow(() -> new NoSuchElementException(
+                                                "Order with ID " + request.getOrderId() + " not found"));
+
+                // Check if the order status is "Cancelled" or "Completed"
+                if (existingOrder.getStatus() == CANCELED || existingOrder.getStatus() == COMPLETED) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Order with ID " + request.getOrderId()
+                                                        + " has either been cancelled or completed");
+                }
+
+                // Update the order status to "Completed"
+                existingOrder.setStatus(COMPLETED);
+
+                // Save the updated order
+                Order completedOrder = orderRepository.save(existingOrder);
+
+                return CancelOrderResponse.builder()
+                                .message("Order with ID " + request.getOrderId() + " is completed")
+                                .orderId(completedOrder.getId())
                                 .build();
         }
 

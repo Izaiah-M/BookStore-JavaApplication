@@ -24,7 +24,9 @@ public class Book {
 
     private String title;
 
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Author author;
 
     @ManyToOne
     @JoinColumn(name = "genre_id")

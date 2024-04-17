@@ -11,6 +11,8 @@ import com.takehome.bookstore.DTOs.books.BookUpdatedResponse;
 import com.takehome.bookstore.DTOs.books.CreateBookRequest;
 import com.takehome.bookstore.DTOs.books.DeleteResponse;
 import com.takehome.bookstore.DTOs.books.UpdateBookRequest;
+import com.takehome.bookstore.models.Books.Author;
+import com.takehome.bookstore.models.Books.AuthorRepository;
 import com.takehome.bookstore.models.Books.Book;
 import com.takehome.bookstore.models.Books.BookRepository;
 import com.takehome.bookstore.models.Books.Genre;
@@ -26,6 +28,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final GenreRepository genreRepository;
+    private final AuthorRepository authorRepository;
 
     public BookUpdatedResponse create(@Valid CreateBookRequest request) {
 
@@ -35,10 +38,15 @@ public class BookService {
                     throw new NoSuchElementException("Genre with ID " + request.getGenreId() + " not found");
                 });
 
+        Author author = authorRepository.findById(request.getAuthorId())
+                .orElseThrow(() -> {
+                    throw new NoSuchElementException("Author with ID " + request.getGenreId() + " not found");
+                });
+
         // Create the book entity
         Book book = Book.builder()
                 .title(request.getTitle())
-                .author(request.getAuthor())
+                .author(author)
                 .genre(genre)
                 .quantity(request.getQuantity())
                 .description(request.getDescription())
@@ -63,7 +71,9 @@ public class BookService {
 
         // Update the fields
         existingBook.setTitle(request.getTitle());
-        existingBook.setAuthor(request.getAuthor());
+        existingBook.setAuthor(authorRepository.findById(request.getAuthorId())
+                .orElseThrow(
+                        () -> new NoSuchElementException("Author with ID " + request.getGenreId() + " not found")));
         existingBook.setGenre(genreRepository.findById(request.getGenreId())
                 .orElseThrow(
                         () -> new NoSuchElementException("Genre with ID " + request.getGenreId() + " not found")));

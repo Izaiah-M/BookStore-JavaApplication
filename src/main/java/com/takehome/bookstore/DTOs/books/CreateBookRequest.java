@@ -18,7 +18,7 @@ public class CreateBookRequest {
     private String title;
 
     @NotEmpty
-    private String author;
+    private Integer authorId;
 
     @NotNull
     private Integer genreId;

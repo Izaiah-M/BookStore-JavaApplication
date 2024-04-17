@@ -2,9 +2,11 @@ package com.takehome.bookstore.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -53,6 +55,18 @@ public class GlobalExceptionHandler {
                 .body("Invalid username or password");
     }
 
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNoSuchElementException(
+            NoSuchElementException ex, WebRequest request) {
+
+        // Log the exception for debugging purposes
+        ex.printStackTrace();
+
+        // Return an Unauthorized (401) status with a custom error message
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> handleResponseStatusException(ResponseStatusException exp) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -60,6 +74,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(exp.getStatusCode())
                 .body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        // Log the exception for debugging purposes
+        ex.printStackTrace();
+
+        // Return a Forbidden (403) status with a custom error message
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Access denied");
     }
 
 }

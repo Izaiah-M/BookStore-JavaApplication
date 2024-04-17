@@ -1,5 +1,8 @@
 package com.takehome.bookstore.DTOs.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.takehome.bookstore.models.User.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -25,4 +28,7 @@ public class RegisterRequest {
 
     @NotEmpty
     private String password;
+
+    @JsonIgnore
+    private Role role;
 }

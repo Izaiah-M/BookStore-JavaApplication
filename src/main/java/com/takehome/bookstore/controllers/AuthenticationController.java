@@ -23,8 +23,6 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
 
-    // TODO: A way to create And Admin
-
     @PostMapping("/register")
     // @Operation(description = "This is for registering a user, the default role is
     // USER", summary = "POST Registration Endpoint")

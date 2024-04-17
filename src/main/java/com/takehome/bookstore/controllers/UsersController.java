@@ -18,7 +18,7 @@ public class UsersController {
     @GetMapping
     @Hidden // To hide it in the swagger docs
     public ResponseEntity<String> sayHello() {
-        return ResponseEntity.ok("Hello, user! this is a secure endpoint though");
+        return ResponseEntity.ok("Hello, user! this is a secure endpoint though, but is accessible to all roles");
     }
 
 }

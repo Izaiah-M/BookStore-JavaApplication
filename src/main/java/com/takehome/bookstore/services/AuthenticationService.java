@@ -1,5 +1,7 @@
 package com.takehome.bookstore.services;
 
+import static com.takehome.bookstore.models.User.Role.USER;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,7 +11,6 @@ import com.takehome.bookstore.DTOs.auth.AuthenticationRequest;
 import com.takehome.bookstore.DTOs.auth.AuthenticationResponse;
 import com.takehome.bookstore.DTOs.auth.RegisterRequest;
 import com.takehome.bookstore.config.JwtService;
-import com.takehome.bookstore.models.User.Role;
 import com.takehome.bookstore.models.User.User;
 import com.takehome.bookstore.models.User.UserRepository;
 
@@ -32,7 +33,7 @@ public class AuthenticationService {
                                 .lastname(request.getLastname())
                                 .email(request.getEmail())
                                 .password(passwordEncoder.encode(request.getPassword()))
-                                .role(Role.USER)
+                                .role(USER)
                                 .build();
 
                 repository.save(user);

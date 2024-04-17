@@ -3,6 +3,7 @@ package com.takehome.bookstore.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.takehome.bookstore.DTOs.books.DeleteResponse;
 import com.takehome.bookstore.DTOs.orders.OrderItemRequest;
 import com.takehome.bookstore.DTOs.orders.OrderRequest;
 import com.takehome.bookstore.DTOs.orders.OrderResponse;
@@ -25,107 +27,120 @@ import com.takehome.bookstore.models.User.User;
 import com.takehome.bookstore.models.User.UserRepository;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final UserRepository userRepository;
-    private final BookRepository bookRepository;
+        private final OrderRepository orderRepository;
+        private final OrderItemRepository orderItemRepository;
+        private final UserRepository userRepository;
+        private final BookRepository bookRepository;
 
-    public OrderResponse placeOrder(@Valid OrderRequest request) {
-        // Retrieve user from the database
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "User not Found"));
+        public OrderResponse placeOrder(@Valid OrderRequest request) {
+                // Retrieve user from the database
+                User user = userRepository.findById(request.getUserId())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "User not Found"));
 
-        // Create a new order
-        Order order = Order.builder()
-                .user(user)
-                .orderDate(LocalDateTime.now())
-                .status(Status.PENDING)
-                .build();
+                // Create a new order
+                Order order = Order.builder()
+                                .user(user)
+                                .orderDate(LocalDateTime.now())
+                                .status(Status.PENDING)
+                                .build();
 
-        // Save the order first
-        Order newOrder = orderRepository.save(order);
+                // Save the order first
+                Order newOrder = orderRepository.save(order);
 
-        Order savedOrder = orderRepository.findById(newOrder.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Order not Found"));
+                Order savedOrder = orderRepository.findById(newOrder.getId())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "Order not Found"));
 
-        // Calculate total price and create order items
-        Double totalPrice = 0.0;
+                // Calculate total price and create order items
+                Double totalPrice = 0.0;
 
-        List<OrderItemRequest> orderItems = request.getOrderItems();
-        List<OrderItem> newOrderItems = new ArrayList<>();
+                List<OrderItemRequest> orderItems = request.getOrderItems();
+                List<OrderItem> newOrderItems = new ArrayList<>();
 
-        for (OrderItemRequest item : orderItems) {
-            // Make sure the books in the list exist
-            Book book = bookRepository.findById(item.getBookId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Book not Found"));
+                for (OrderItemRequest item : orderItems) {
+                        // Make sure the books in the list exist
+                        Book book = bookRepository.findById(item.getBookId())
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                        "Book not Found"));
 
-            Integer requestedQuantity = item.getQuantity();
-            Integer availableQuantity = book.getQuantity();
+                        Integer requestedQuantity = item.getQuantity();
+                        Integer availableQuantity = book.getQuantity();
 
-            if (requestedQuantity > availableQuantity) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Not enough stock for the book titled: " + book.getTitle());
-            }
+                        if (requestedQuantity > availableQuantity) {
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "Not enough stock for the book titled: " + book.getTitle());
+                        }
 
-            // Create order item
-            OrderItem orderItem = OrderItem.builder()
-                    .book(book)
-                    .quantity(requestedQuantity)
-                    .subtotal(book.getPrice() * requestedQuantity)
-                    .order(savedOrder) // Associate the OrderItem with the saved Order
-                    .build();
+                        // Create order item
+                        OrderItem orderItem = OrderItem.builder()
+                                        .book(book)
+                                        .quantity(requestedQuantity)
+                                        .subtotal(book.getPrice() * requestedQuantity)
+                                        .order(savedOrder) // Associate the OrderItem with the saved Order
+                                        .build();
 
-            // Save the order item
-            OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+                        // Save the order item
+                        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
 
-            newOrderItems.add(savedOrderItem);
+                        newOrderItems.add(savedOrderItem);
 
-            // Add the subtotal to the total price of the order
-            totalPrice += savedOrderItem.getSubtotal();
+                        // Add the subtotal to the total price of the order
+                        totalPrice += savedOrderItem.getSubtotal();
 
-            // Update book quantity
-            book.setQuantity(availableQuantity - requestedQuantity);
-            bookRepository.save(book);
+                        // Update book quantity
+                        book.setQuantity(availableQuantity - requestedQuantity);
+                        bookRepository.save(book);
+                }
+
+                // Set the list of order items to the saved order
+                savedOrder.setOrderItems(newOrderItems);
+
+                // Set the total price for the order
+                savedOrder.setTotalPrice(totalPrice);
+
+                // Save the updated order with associated order items
+                Order updatedOrder = orderRepository.save(savedOrder);
+
+                return OrderResponse.builder()
+                                .message("Your order has been successfully placed!")
+                                .orderId(updatedOrder.getId())
+                                .orderAmount(totalPrice)
+                                .build();
         }
 
-        // Set the list of order items to the saved order
-        savedOrder.setOrderItems(newOrderItems);
+        // Service that handles getting all orders
+        public Page<Order> getAllOrders(PageRequest pageRequest) {
+                return orderRepository.findAll(pageRequest);
+        }
 
-        // Set the total price for the order
-        savedOrder.setTotalPrice(totalPrice);
+        public ResponseEntity<Order> getOrderById(Integer orderId) {
+                Order order = orderRepository.findById(orderId)
+                                .orElseThrow(() -> {
+                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                        "Order Not Found");
+                                });
 
-        // Save the updated order with associated order items
-        Order updatedOrder = orderRepository.save(savedOrder);
+                return ResponseEntity.ok(order);
+        }
 
-        return OrderResponse.builder()
-                .message("Your order has been successfully placed!")
-                .orderId(updatedOrder.getId())
-                .orderAmount(totalPrice)
-                .build();
-    }
+        public DeleteResponse delete(@NotNull Integer orderId) {
+                Order existingOrder = orderRepository.findById(orderId)
+                                .orElseThrow(() -> new NoSuchElementException(
+                                                "Order with ID " + orderId + " not found"));
 
-    // Service that handles getting all orders
-    public Page<Order> getAllOrders(PageRequest pageRequest) {
-        return orderRepository.findAll(pageRequest);
-    }
+                orderRepository.delete(existingOrder);
 
-    public ResponseEntity<Order> getOrderById(Integer orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Order Not Found");
-                });
-
-        return ResponseEntity.ok(order);
-    }
+                return DeleteResponse.builder()
+                                .message("Order has been successfully deleted")
+                                .build();
+        }
 
 }

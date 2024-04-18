@@ -21,6 +21,7 @@ import com.takehome.bookstore.DTOs.books.DeleteResponse;
 import com.takehome.bookstore.models.Books.Author;
 import com.takehome.bookstore.services.AuthorService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,12 +39,14 @@ public class AuthorController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for creating an Author, Access level required is ADMIN or MANAGER", summary = "Create Author")
     public ResponseEntity<UpdateAuthorResponseDTO> create(
             @Valid @RequestBody CreateAuthorDTO request) {
         return ResponseEntity.ok(service.create(request));
     }
 
     @GetMapping
+    @Operation(description = "This is for getting all Authors, Access level required is USER, ADMIN or MANAGER", summary = "Get all Authors")
     public ResponseEntity<Page<Author>> getAllAuthors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
@@ -54,6 +57,7 @@ public class AuthorController {
 
     @PutMapping("/{authorId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for Updating an Author, Access level required is ADMIN or MANAGER", summary = "Update Author")
     public ResponseEntity<UpdateAuthorResponseDTO> update(
             @PathVariable @NotNull Integer authorId,
             @Valid @RequestBody UpdateAuthorDTO request) {
@@ -63,6 +67,7 @@ public class AuthorController {
 
     @DeleteMapping("/{authorId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for deleting an Author, Access level required is ADMIN or MANAGER", summary = "Delete Author")
     public ResponseEntity<DeleteResponse> delete(@PathVariable @NotNull Integer authorId) {
         return ResponseEntity.ok(service.delete(authorId));
     }

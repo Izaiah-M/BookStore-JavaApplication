@@ -21,6 +21,7 @@ import com.takehome.bookstore.DTOs.genres.UpdateGenreRequest;
 import com.takehome.bookstore.models.Books.Genre;
 import com.takehome.bookstore.services.GenreService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class GenreController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for creating a Genre, Access level required is ADMIN or MANAGER", summary = "Create Genre")
     public ResponseEntity<GenreUpdatedResponse> create(
             @Valid @RequestBody CreateGenreRequest request) {
 
@@ -46,6 +48,7 @@ public class GenreController {
 
     @PutMapping("/{genreId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for updating a Genre, Access level required is ADMIN or MANAGER", summary = "Update Genre")
     public ResponseEntity<GenreUpdatedResponse> update(
             @PathVariable Integer genreId,
             @Valid @RequestBody UpdateGenreRequest request) {
@@ -53,6 +56,7 @@ public class GenreController {
     }
 
     @GetMapping
+    @Operation(description = "This is for getting all genres, Access level required is USER, ADMIN, MANAGER", summary = "Get all Genres")
     public ResponseEntity<Page<Genre>> getAllGenres(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
@@ -62,12 +66,14 @@ public class GenreController {
     }
 
     @GetMapping("/{genreId}")
+    @Operation(description = "This is for getting  a single genre, Access level required is USER, ADMIN, MANAGER", summary = "Get Genre By Id")
     public ResponseEntity<Genre> getGenreById(@PathVariable Integer genreId) {
         return service.getGenreById(genreId);
     }
 
     @DeleteMapping("/{genreId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(description = "This is for deleting a Genre, Access level required is ADMIN or MANAGER", summary = "Delete Genre")
     public ResponseEntity<DeleteResponse> delete(@PathVariable @NotNull Integer genreId) {
         return ResponseEntity.ok(service.delete(genreId));
     }

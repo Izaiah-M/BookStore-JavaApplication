@@ -28,7 +28,6 @@ public class CreateBookRequest {
     private Integer quantity;
 
     @NotNull
-    @Positive(message = "Price must be a positive number")
     private Double price;
 
     @NotEmpty
